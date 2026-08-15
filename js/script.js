@@ -8,11 +8,33 @@ charCount = document.querySelector(".char-count");
 // Debounce timeout variable
 let translateTimeout;
 
-// Populate language selectors
+// Populate language selectors with simple codes
+const languages = {
+    "en": "English",
+    "es": "Spanish",
+    "fr": "French",
+    "de": "German",
+    "it": "Italian",
+    "pt": "Portuguese",
+    "ru": "Russian",
+    "ja": "Japanese",
+    "zh-CN": "Chinese (Simplified)",
+    "ko": "Korean",
+    "hi": "Hindi",
+    "ar": "Arabic"
+};
+
 [fromSelect, toSelect].forEach((select, index) => {
-    for (let country_code in countries) {
-        let selected = index == 0 ? country_code == "en-GB" ? "selected" : "" : country_code == "hi-IN" ? "selected" : "";
-        let option = `<option ${selected} value="${country_code}">${countries[country_code]}</option>`;
+    // Add Detect Language option for source
+    if (index === 0) {
+        let option = `<option value="auto">Detect Language</option>`;
+        select.insertAdjacentHTML("beforeend", option);
+    }
+    
+    // Add all languages
+    for (let code in languages) {
+        let selected = index == 0 ? code == "en" ? "selected" : "" : code == "es" ? "selected" : "";
+        let option = `<option ${selected} value="${code}">${languages[code]}</option>`;
         select.insertAdjacentHTML("beforeend", option);
     }
 });
@@ -129,27 +151,8 @@ toSelect.addEventListener("change", () => {
     }
 });
 
-// Action buttons (copy and speak)
-document.getElementById("from-copy").addEventListener("click", () => {
-    if(!fromText.value) return;
-    navigator.clipboard.writeText(fromText.value);
-});
-
+// Action buttons (copy only - speak removed for minimal design)
 document.getElementById("to-copy").addEventListener("click", () => {
     if(!toText.value) return;
     navigator.clipboard.writeText(toText.value);
-});
-
-document.getElementById("from-speak").addEventListener("click", () => {
-    if(!fromText.value) return;
-    let utterance = new SpeechSynthesisUtterance(fromText.value);
-    utterance.lang = fromSelect.value;
-    speechSynthesis.speak(utterance);
-});
-
-document.getElementById("to-speak").addEventListener("click", () => {
-    if(!toText.value) return;
-    let utterance = new SpeechSynthesisUtterance(toText.value);
-    utterance.lang = toSelect.value;
-    speechSynthesis.speak(utterance);
 });
