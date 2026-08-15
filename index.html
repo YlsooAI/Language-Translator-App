@@ -26,6 +26,9 @@
           <a href="#">API</a>
           <a href="#">Support</a>
         </nav>
+        <button class="camera-btn" id="camera-btn" title="Camera Translation">
+          <i class="fas fa-camera"></i>
+        </button>
       </div>
     </header>
 
@@ -90,6 +93,27 @@
       </footer>
     </div>
 
+    <!-- Camera AR Overlay -->
+    <div class="camera-overlay" id="camera-overlay">
+      <video id="camera-feed" autoplay playsinline></video>
+      <div class="ar-ui">
+        <div class="scan-reticle"></div>
+        <div class="translation-bubble" id="translation-bubble">
+          <span class="bubble-text" id="bubble-text"></span>
+        </div>
+        <div class="camera-controls">
+          <button class="close-camera-btn" id="close-camera-btn">
+            <i class="fas fa-times"></i>
+          </button>
+          <div class="scan-status">
+            <div class="scan-dot"></div>
+            <span>Scanning...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
     <script src="js/countries.js"></script>
     <script src="js/script.js"></script>
 
