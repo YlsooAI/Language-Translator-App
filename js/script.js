@@ -3,8 +3,10 @@ toText = document.querySelector(".to-text"),
 exchageIcon = document.querySelector(".exchange-btn"),
 fromSelect = document.querySelector(".from-language"),
 toSelect = document.querySelector(".to-language"),
-translateBtn = document.querySelector(".translate-btn"),
 charCount = document.querySelector(".char-count");
+
+// Debounce timeout variable
+let translateTimeout;
 
 // Populate language selectors
 [fromSelect, toSelect].forEach((select, index) => {
@@ -15,7 +17,7 @@ charCount = document.querySelector(".char-count");
     }
 });
 
-// Swap languages
+// Swap languages and trigger translation
 exchageIcon.addEventListener("click", () => {
     let tempText = fromText.value,
     tempLang = fromSelect.value;
@@ -23,30 +25,43 @@ exchageIcon.addEventListener("click", () => {
     toText.value = tempText;
     fromSelect.value = toSelect.value;
     toSelect.value = tempLang;
+    
+    // Trigger translation if there's text after swap
+    if(fromText.value) {
+        clearTimeout(translateTimeout);
+        translateTimeout = setTimeout(() => {
+            performTranslation();
+        }, 500);
+    }
 });
 
-// Update character count
+// Update character count and trigger auto-translate
 fromText.addEventListener("keyup", () => {
     const count = fromText.value.length;
     charCount.textContent = `${count} / 5000`;
     
     if(!fromText.value) {
         toText.value = "";
+        hideLoading();
+    } else {
+        // Debounce the translation - wait 500ms after user stops typing
+        clearTimeout(translateTimeout);
+        translateTimeout = setTimeout(() => {
+            performTranslation();
+        }, 500);
     }
 });
 
-// Translate function
-translateBtn.addEventListener("click", () => {
+// Perform translation function
+function performTranslation() {
     let text = fromText.value.trim(),
-    translateFrom = fromSelect.value.split("-")[0], // Get language code without country
+    translateFrom = fromSelect.value.split("-")[0],
     translateTo = toSelect.value.split("-")[0];
 
     if(!text) return;
 
-    // Show loading state
-    translateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Translating...';
-    translateBtn.disabled = true;
-    toText.setAttribute("placeholder", "Translating...");
+    // Show loading state with Apple-like animation
+    showLoading();
 
     // Using Google Translate via a no-key endpoint
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${translateFrom}&tl=${translateTo}&dt=t&q=${encodeURIComponent(text)}`;
@@ -61,18 +76,46 @@ translateBtn.addEventListener("click", () => {
                 .join('');
             
             toText.value = translatedText;
-            toText.setAttribute("placeholder", "Translation will appear here...");
-
-            // Reset button
-            translateBtn.innerHTML = '<i class="fas fa-language"></i> Translate Now';
-            translateBtn.disabled = false;
+            hideLoading();
         })
         .catch(error => {
             console.error('Translation error:', error);
             toText.value = "Error: Unable to translate. Please try again.";
-            translateBtn.innerHTML = '<i class="fas fa-language"></i> Translate Now';
-            translateBtn.disabled = false;
+            hideLoading();
         });
+}
+
+// Show loading indicator with smooth fade-in
+function showLoading() {
+    const statusDiv = document.querySelector('.translation-status');
+    statusDiv.style.opacity = '1';
+    statusDiv.style.visibility = 'visible';
+}
+
+// Hide loading indicator with smooth fade-out
+function hideLoading() {
+    const statusDiv = document.querySelector('.translation-status');
+    statusDiv.style.opacity = '0';
+    statusDiv.style.visibility = 'hidden';
+}
+
+// Also trigger translation when language selection changes
+fromSelect.addEventListener("change", () => {
+    if(fromText.value) {
+        clearTimeout(translateTimeout);
+        translateTimeout = setTimeout(() => {
+            performTranslation();
+        }, 500);
+    }
+});
+
+toSelect.addEventListener("change", () => {
+    if(fromText.value) {
+        clearTimeout(translateTimeout);
+        translateTimeout = setTimeout(() => {
+            performTranslation();
+        }, 500);
+    }
 });
 
 // Action buttons (copy and speak)
