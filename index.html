@@ -2,43 +2,116 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">  
-    <title>Language Translator App</title>
+    <title>GlobalTranslate Enterprise | Professional Language Solutions</title>
     <link rel="stylesheet" href="style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
-    <div class="container">
-      <div class="wrapper">
-        <div class="text-input">
-          <textarea spellcheck="false" class="from-text" placeholder="Enter text"></textarea>
-          <textarea spellcheck="false" readonly disabled class="to-text" placeholder="Translation"></textarea>
+    <header class="main-header">
+      <div class="header-content">
+        <div class="logo">
+          <i class="fas fa-globe-americas"></i>
+          <span>GlobalTranslate</span>
         </div>
-        <ul class="controls">
-          <li class="row from">
-            <div class="icons">
-              <i id="from" class="fas fa-volume-up"></i>
-              <i id="from" class="fas fa-copy"></i>
-            </div>
-            <select></select>
-          </li>
-          <li class="exchange"><i class="fas fa-exchange-alt"></i></li>
-          <li class="row to">
-            <select></select>
-            <div class="icons">
-              <i id="to" class="fas fa-volume-up"></i>
-              <i id="to" class="fas fa-copy"></i>
-            </div>
-          </li>
-        </ul>
+        <nav class="nav-links">
+          <a href="#">Solutions</a>
+          <a href="#">Enterprise</a>
+          <a href="#">API</a>
+          <a href="#">Support</a>
+        </nav>
       </div>
-      <button>Translate Text</button>
-      <br>
-      <br>
-      <div class="love">
-        Made with &hearts; by
-        <a href="https://github.com/DevGoyalG">Dev Goyal</a>
-    </div>
+    </header>
+
+    <div class="container">
+      <div class="hero-section">
+        <h1>Professional Translation Services</h1>
+        <p>Enterprise-grade language translation powered by advanced AI technology</p>
+      </div>
+
+      <div class="translator-card">
+        <div class="card-header">
+          <div class="language-selector">
+            <label>From</label>
+            <div class="select-wrapper">
+              <select class="from-language"></select>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+          </div>
+          
+          <button class="exchange-btn" title="Swap languages">
+            <i class="fas fa-exchange-alt"></i>
+          </button>
+          
+          <div class="language-selector">
+            <label>To</label>
+            <div class="select-wrapper">
+              <select class="to-language"></select>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-input">
+          <div class="input-panel">
+            <textarea spellcheck="false" class="from-text" placeholder="Enter your text here..."></textarea>
+            <div class="panel-actions">
+              <button class="action-btn" id="from-speak" title="Listen">
+                <i class="fas fa-volume-up"></i>
+              </button>
+              <button class="action-btn" id="from-copy" title="Copy">
+                <i class="fas fa-copy"></i>
+              </button>
+              <span class="char-count">0 / 5000</span>
+            </div>
+          </div>
+          
+          <div class="input-panel output-panel">
+            <textarea spellcheck="false" readonly disabled class="to-text" placeholder="Translation will appear here..."></textarea>
+            <div class="panel-actions">
+              <button class="action-btn" id="to-speak" title="Listen">
+                <i class="fas fa-volume-up"></i>
+              </button>
+              <button class="action-btn" id="to-copy" title="Copy">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button class="translate-btn">
+          <i class="fas fa-language"></i>
+          Translate Now
+        </button>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-item">
+          <i class="fas fa-shield-alt"></i>
+          <h3>Enterprise Security</h3>
+          <p>Bank-level encryption for all translations</p>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-bolt"></i>
+          <h3>Real-time Processing</h3>
+          <p>Instant translations with AI precision</p>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-check-circle"></i>
+          <h3>99.9% Accuracy</h3>
+          <p>Industry-leading translation quality</p>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <p>&copy; 2024 GlobalTranslate Enterprise. All rights reserved.</p>
+        <div class="footer-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Contact Us</a>
+        </div>
+      </footer>
     </div>
 
     <script src="js/countries.js"></script>

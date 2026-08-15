@@ -1,70 +1,99 @@
 const fromText = document.querySelector(".from-text"),
 toText = document.querySelector(".to-text"),
-exchageIcon = document.querySelector(".exchange"),
-selectTag = document.querySelectorAll("select"),
-icons = document.querySelectorAll(".row i");
-translateBtn = document.querySelector("button"),
+exchageIcon = document.querySelector(".exchange-btn"),
+fromSelect = document.querySelector(".from-language"),
+toSelect = document.querySelector(".to-language"),
+translateBtn = document.querySelector(".translate-btn"),
+charCount = document.querySelector(".char-count");
 
-selectTag.forEach((tag, id) => {
+// Populate language selectors
+[fromSelect, toSelect].forEach((select, index) => {
     for (let country_code in countries) {
-        let selected = id == 0 ? country_code == "en-GB" ? "selected" : "" : country_code == "hi-IN" ? "selected" : "";
+        let selected = index == 0 ? country_code == "en-GB" ? "selected" : "" : country_code == "hi-IN" ? "selected" : "";
         let option = `<option ${selected} value="${country_code}">${countries[country_code]}</option>`;
-        tag.insertAdjacentHTML("beforeend", option);
+        select.insertAdjacentHTML("beforeend", option);
     }
 });
 
+// Swap languages
 exchageIcon.addEventListener("click", () => {
     let tempText = fromText.value,
-    tempLang = selectTag[0].value;
+    tempLang = fromSelect.value;
     fromText.value = toText.value;
     toText.value = tempText;
-    selectTag[0].value = selectTag[1].value;
-    selectTag[1].value = tempLang;
+    fromSelect.value = toSelect.value;
+    toSelect.value = tempLang;
 });
 
+// Update character count
 fromText.addEventListener("keyup", () => {
+    const count = fromText.value.length;
+    charCount.textContent = `${count} / 5000`;
+    
     if(!fromText.value) {
         toText.value = "";
     }
 });
 
+// Translate function
 translateBtn.addEventListener("click", () => {
     let text = fromText.value.trim(),
-    translateFrom = selectTag[0].value,
-    translateTo = selectTag[1].value;
+    translateFrom = fromSelect.value,
+    translateTo = toSelect.value;
+    
     if(!text) return;
+    
+    // Show loading state
+    translateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Translating...';
+    translateBtn.disabled = true;
     toText.setAttribute("placeholder", "Translating...");
-    let apiUrl = `https://api.mymemory.translated.net/get?q=${text}&langpair=${translateFrom}|${translateTo}`;
-    fetch(apiUrl).then(res => res.json()).then(data => {
-        toText.value = data.responseData.translatedText;
-        data.matches.forEach(data => {
-            if(data.id === 0) {
-                toText.value = data.translation;
-            }
+    
+    let apiUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${translateFrom}|${translateTo}`;
+    
+    fetch(apiUrl)
+        .then(res => res.json())
+        .then(data => {
+            toText.value = data.responseData.translatedText;
+            data.matches.forEach(data => {
+                if(data.id === 0) {
+                    toText.value = data.translation;
+                }
+            });
+            toText.setAttribute("placeholder", "Translation will appear here...");
+            
+            // Reset button
+            translateBtn.innerHTML = '<i class="fas fa-language"></i> Translate Now';
+            translateBtn.disabled = false;
+        })
+        .catch(error => {
+            console.error('Translation error:', error);
+            toText.value = "Error: Unable to translate. Please try again.";
+            translateBtn.innerHTML = '<i class="fas fa-language"></i> Translate Now';
+            translateBtn.disabled = false;
         });
-        toText.setAttribute("placeholder", "Translation");
-    });
 });
 
-icons.forEach(icon => {
-    icon.addEventListener("click", ({target}) => {
-        if(!fromText.value || !toText.value) return;
-        if(target.classList.contains("fa-copy")) {
-            if(target.id == "from") {
-                navigator.clipboard.writeText(fromText.value);
-            } else {
-                navigator.clipboard.writeText(toText.value);
-            }
-        } else {
-            let utterance;
-            if(target.id == "from") {
-                utterance = new SpeechSynthesisUtterance(fromText.value);
-                utterance.lang = selectTag[0].value;
-            } else {
-                utterance = new SpeechSynthesisUtterance(toText.value);
-                utterance.lang = selectTag[1].value;
-            }
-            speechSynthesis.speak(utterance);
-        }
-    });
+// Action buttons (copy and speak)
+document.getElementById("from-copy").addEventListener("click", () => {
+    if(!fromText.value) return;
+    navigator.clipboard.writeText(fromText.value);
+});
+
+document.getElementById("to-copy").addEventListener("click", () => {
+    if(!toText.value) return;
+    navigator.clipboard.writeText(toText.value);
+});
+
+document.getElementById("from-speak").addEventListener("click", () => {
+    if(!fromText.value) return;
+    let utterance = new SpeechSynthesisUtterance(fromText.value);
+    utterance.lang = fromSelect.value;
+    speechSynthesis.speak(utterance);
+});
+
+document.getElementById("to-speak").addEventListener("click", () => {
+    if(!toText.value) return;
+    let utterance = new SpeechSynthesisUtterance(toText.value);
+    utterance.lang = toSelect.value;
+    speechSynthesis.speak(utterance);
 });
