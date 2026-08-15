@@ -1,15 +1,11 @@
 const fromText = document.querySelector(".from-text"),
 toText = document.querySelector(".to-text"),
 exchageIcon = document.querySelector(".exchange-btn"),
-fromSelect = document.querySelector(".from-language"),
-toSelect = document.querySelector(".to-language"),
 charCount = document.querySelector(".char-count");
 
-// Debounce timeout variable
-let translateTimeout;
-
-// Populate language selectors with simple codes
+// Language data
 const languages = {
+    "auto": "Detect Language",
     "en": "English",
     "es": "Spanish",
     "fr": "French",
@@ -24,29 +20,148 @@ const languages = {
     "ar": "Arabic"
 };
 
-[fromSelect, toSelect].forEach((select, index) => {
-    // Add Detect Language option for source
-    if (index === 0) {
-        let option = `<option value="auto">Detect Language</option>`;
-        select.insertAdjacentHTML("beforeend", option);
-    }
+// Current selected languages
+let fromLang = "auto";
+let toLang = "es";
+
+// Debounce timeout variable
+let translateTimeout;
+
+// Initialize custom dropdowns
+function initDropdown(dropdownId, selectedValue, onSelect) {
+    const dropdown = document.getElementById(dropdownId);
+    const trigger = dropdown.querySelector('.dropdown-trigger');
+    const menu = dropdown.querySelector('.dropdown-menu');
+    const searchInput = dropdown.querySelector('.dropdown-search');
+    const optionsContainer = dropdown.querySelector('.dropdown-options');
+    const selectedText = trigger.querySelector('.selected-text');
     
-    // Add all languages
-    for (let code in languages) {
-        let selected = index == 0 ? code == "en" ? "selected" : "" : code == "es" ? "selected" : "";
-        let option = `<option ${selected} value="${code}">${languages[code]}</option>`;
-        select.insertAdjacentHTML("beforeend", option);
+    // Populate options
+    Object.entries(languages).forEach(([code, name]) => {
+        // Skip 'auto' for target language dropdown
+        if (dropdownId === 'to-language-dropdown' && code === 'auto') return;
+        
+        const option = document.createElement('div');
+        option.className = 'dropdown-option';
+        if (code === selectedValue) {
+            option.classList.add('selected');
+        }
+        option.textContent = name;
+        option.dataset.value = code;
+        
+        option.addEventListener('click', () => {
+            onSelect(code, name);
+            closeAllDropdowns();
+        });
+        
+        optionsContainer.appendChild(option);
+    });
+    
+    // Toggle dropdown
+    trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isActive = trigger.classList.contains('active');
+        closeAllDropdowns();
+        if (!isActive) {
+            trigger.classList.add('active');
+            menu.classList.add('show');
+            searchInput.value = '';
+            filterOptions(optionsContainer, searchInput.value);
+            setTimeout(() => searchInput.focus(), 100);
+        }
+    });
+    
+    // Search functionality
+    searchInput.addEventListener('input', (e) => {
+        filterOptions(optionsContainer, e.target.value);
+    });
+    
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target)) {
+            trigger.classList.remove('active');
+            menu.classList.remove('show');
+        }
+    });
+    
+    // Prevent closing when clicking inside menu
+    menu.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+}
+
+function filterOptions(container, searchTerm) {
+    const options = container.querySelectorAll('.dropdown-option');
+    const term = searchTerm.toLowerCase();
+    
+    options.forEach(option => {
+        const text = option.textContent.toLowerCase();
+        if (text.includes(term)) {
+            option.style.display = 'flex';
+        } else {
+            option.style.display = 'none';
+        }
+    });
+}
+
+function closeAllDropdowns() {
+    document.querySelectorAll('.dropdown-trigger').forEach(trigger => {
+        trigger.classList.remove('active');
+    });
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        menu.classList.remove('show');
+    });
+}
+
+function updateFromLanguage(code, name) {
+    fromLang = code;
+    document.querySelector('#from-language-dropdown .selected-text').textContent = name;
+    document.querySelector('#from-language-dropdown .dropdown-option.selected')?.classList.remove('selected');
+    const newSelected = document.querySelector(`#from-language-dropdown .dropdown-option[data-value="${code}"]`);
+    if (newSelected) newSelected.classList.add('selected');
+    
+    if(fromText.value) {
+        clearTimeout(translateTimeout);
+        translateTimeout = setTimeout(() => {
+            performTranslation();
+        }, 500);
     }
-});
+}
+
+function updateToLanguage(code, name) {
+    toLang = code;
+    document.querySelector('#to-language-dropdown .selected-text').textContent = name;
+    document.querySelector('#to-language-dropdown .dropdown-option.selected')?.classList.remove('selected');
+    const newSelected = document.querySelector(`#to-language-dropdown .dropdown-option[data-value="${code}"]`);
+    if (newSelected) newSelected.classList.add('selected');
+    
+    if(fromText.value) {
+        clearTimeout(translateTimeout);
+        translateTimeout = setTimeout(() => {
+            performTranslation();
+        }, 500);
+    }
+}
+
+// Initialize both dropdowns
+initDropdown('from-language-dropdown', fromLang, updateFromLanguage);
+initDropdown('to-language-dropdown', toLang, updateToLanguage);
 
 // Swap languages and trigger translation
 exchageIcon.addEventListener("click", () => {
     let tempText = fromText.value,
-    tempLang = fromSelect.value;
+    tempLang = fromLang,
+    tempLangName = document.querySelector('#from-language-dropdown .selected-text').textContent;
+    
     fromText.value = toText.value;
     toText.value = tempText;
-    fromSelect.value = toSelect.value;
-    toSelect.value = tempLang;
+    
+    // Swap language values
+    const prevFromLang = fromLang;
+    const prevFromName = document.querySelector('#from-language-dropdown .selected-text').textContent;
+    
+    updateFromLanguage(toLang, document.querySelector('#to-language-dropdown .selected-text').textContent);
+    updateToLanguage(prevFromLang, prevFromName);
     
     // Trigger translation if there's text after swap
     if(fromText.value) {
@@ -77,8 +192,8 @@ fromText.addEventListener("keyup", () => {
 // Perform translation function
 function performTranslation() {
     let text = fromText.value.trim(),
-    translateFrom = fromSelect.value.split("-")[0],
-    translateTo = toSelect.value.split("-")[0];
+    translateFrom = fromLang.split("-")[0],
+    translateTo = toLang.split("-")[0];
 
     if(!text) return;
 
@@ -131,25 +246,6 @@ function hideLoading() {
     statusDiv.style.opacity = '0';
     statusDiv.style.visibility = 'hidden';
 }
-
-// Also trigger translation when language selection changes
-fromSelect.addEventListener("change", () => {
-    if(fromText.value) {
-        clearTimeout(translateTimeout);
-        translateTimeout = setTimeout(() => {
-            performTranslation();
-        }, 500);
-    }
-});
-
-toSelect.addEventListener("change", () => {
-    if(fromText.value) {
-        clearTimeout(translateTimeout);
-        translateTimeout = setTimeout(() => {
-            performTranslation();
-        }, 500);
-    }
-});
 
 // Action buttons (copy only - speak removed for minimal design)
 document.getElementById("to-copy").addEventListener("click", () => {
