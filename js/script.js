@@ -75,7 +75,18 @@ function performTranslation() {
                 .map(item => item[0])
                 .join('');
             
+            // Reset animation by removing the class first
+            toText.classList.remove('fade-in');
+            
+            // Force reflow to restart animation
+            void toText.offsetWidth;
+            
+            // Set the translated text
             toText.value = translatedText;
+            
+            // Add fade-in class for smooth Gemini-style animation
+            toText.classList.add('fade-in');
+            
             hideLoading();
         })
         .catch(error => {
