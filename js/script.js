@@ -38,29 +38,31 @@ fromText.addEventListener("keyup", () => {
 // Translate function
 translateBtn.addEventListener("click", () => {
     let text = fromText.value.trim(),
-    translateFrom = fromSelect.value,
-    translateTo = toSelect.value;
-    
+    translateFrom = fromSelect.value.split("-")[0], // Get language code without country
+    translateTo = toSelect.value.split("-")[0];
+
     if(!text) return;
-    
+
     // Show loading state
     translateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Translating...';
     translateBtn.disabled = true;
     toText.setAttribute("placeholder", "Translating...");
-    
-    let apiUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${translateFrom}|${translateTo}`;
-    
-    fetch(apiUrl)
+
+    // Using Google Translate via a no-key endpoint
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${translateFrom}&tl=${translateTo}&dt=t&q=${encodeURIComponent(text)}`;
+
+    fetch(url)
         .then(res => res.json())
         .then(data => {
-            toText.value = data.responseData.translatedText;
-            data.matches.forEach(data => {
-                if(data.id === 0) {
-                    toText.value = data.translation;
-                }
-            });
-            toText.setAttribute("placeholder", "Translation will appear here...");
+            // Extract translation from Google's response format
+            let translatedText = data[0]
+                .filter(item => item[0])
+                .map(item => item[0])
+                .join('');
             
+            toText.value = translatedText;
+            toText.setAttribute("placeholder", "Translation will appear here...");
+
             // Reset button
             translateBtn.innerHTML = '<i class="fas fa-language"></i> Translate Now';
             translateBtn.disabled = false;
