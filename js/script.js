@@ -252,3 +252,148 @@ document.getElementById("to-copy").addEventListener("click", () => {
     if(!toText.value) return;
     navigator.clipboard.writeText(toText.value);
 });
+
+// Camera Translation Feature
+const cameraBtn = document.getElementById('camera-btn');
+const closeCameraBtn = document.getElementById('close-camera-btn');
+const cameraOverlay = document.getElementById('camera-overlay');
+const cameraFeed = document.getElementById('camera-feed');
+const translationBubble = document.getElementById('translation-bubble');
+const bubbleText = document.getElementById('bubble-text');
+
+let isCameraActive = false;
+let scanInterval = null;
+let lastDetectedText = '';
+
+// Open camera
+cameraBtn.addEventListener('click', async () => {
+    try {
+        // Request camera access
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment' } // Use back camera on mobile
+        });
+        
+        cameraFeed.srcObject = stream;
+        cameraOverlay.classList.add('active');
+        isCameraActive = true;
+        
+        // Start scanning every 2 seconds
+        startScanning();
+    } catch (error) {
+        console.error('Camera access denied:', error);
+        alert('Camera access is required for this feature. Please allow camera permissions and try again.');
+    }
+});
+
+// Close camera
+closeCameraBtn.addEventListener('click', () => {
+    stopCamera();
+});
+
+function stopCamera() {
+    if (cameraFeed.srcObject) {
+        const tracks = cameraFeed.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+        cameraFeed.srcObject = null;
+    }
+    
+    cameraOverlay.classList.remove('active');
+    isCameraActive = false;
+    
+    if (scanInterval) {
+        clearInterval(scanInterval);
+        scanInterval = null;
+    }
+    
+    translationBubble.classList.remove('visible');
+    lastDetectedText = '';
+}
+
+function startScanning() {
+    // Scan every 2 seconds
+    scanInterval = setInterval(async () => {
+        if (!isCameraActive) return;
+        
+        try {
+            // Capture current frame from video
+            const canvas = document.createElement('canvas');
+            canvas.width = cameraFeed.videoWidth;
+            canvas.height = cameraFeed.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
+            
+            // Get image data for OCR
+            const imageData = canvas.toDataURL('image/jpeg', 0.8);
+            
+            // Show scanning status
+            const scanStatus = document.querySelector('.scan-status');
+            scanStatus.style.opacity = '0.7';
+            
+            // Use Tesseract.js for OCR
+            const worker = Tesseract.createWorker({
+                logger: m => {
+                    if (m.status === 'recognizing text') {
+                        scanStatus.style.opacity = '1';
+                    }
+                }
+            });
+            
+            await worker.load();
+            await worker.loadLanguage('eng');
+            await worker.initialize('eng');
+            
+            const { data: { text } } = await worker.recognize(imageData);
+            await worker.terminate();
+            
+            // If text detected and different from last, translate it
+            const trimmedText = text.trim().replace(/\s+/g, ' ');
+            
+            if (trimmedText && trimmedText !== lastDetectedText && trimmedText.length > 2) {
+                lastDetectedText = trimmedText;
+                
+                // Show bubble with loading state
+                bubbleText.textContent = 'Translating...';
+                translationBubble.classList.add('visible');
+                
+                // Translate the detected text
+                const translateFrom = fromLang.split("-")[0];
+                const translateTo = toLang.split("-")[0];
+                
+                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${translateFrom}&tl=${translateTo}&dt=t&q=${encodeURIComponent(trimmedText)}`;
+                
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    let translatedText = data[0]
+                        .filter(item => item[0])
+                        .map(item => item[0])
+                        .join('');
+                    
+                    // Update bubble with translated text
+                    bubbleText.textContent = translatedText;
+                    
+                    // Auto-hide bubble after 4 seconds of no new text
+                    clearTimeout(window.bubbleHideTimeout);
+                    window.bubbleHideTimeout = setTimeout(() => {
+                        if (isCameraActive) {
+                            translationBubble.classList.remove('visible');
+                        }
+                    }, 4000);
+                    
+                } catch (error) {
+                    console.error('Translation error:', error);
+                    bubbleText.textContent = 'Translation failed';
+                }
+            } else if (!trimmedText) {
+                // No text detected, hide bubble
+                translationBubble.classList.remove('visible');
+            }
+            
+            scanStatus.style.opacity = '1';
+            
+        } catch (error) {
+            console.error('OCR error:', error);
+        }
+    }, 2000);
+}
