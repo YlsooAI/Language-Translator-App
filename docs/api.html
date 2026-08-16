@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">  
+    <title>API Documentation | Yavqo</title>
+    <link rel="stylesheet" href="../style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+      .api-docs-container {
+        max-width: 900px;
+        margin: 120px auto 60px;
+        padding: 40px 20px;
+      }
+      .api-docs-header {
+        text-align: center;
+        margin-bottom: 50px;
+      }
+      .api-docs-header h1 {
+        font-size: 2.5rem;
+        color: #1a1a2e;
+        margin-bottom: 15px;
+      }
+      .api-docs-header p {
+        font-size: 1.1rem;
+        color: #666;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .api-section {
+        background: #fff;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      }
+      .api-section h2 {
+        color: #1a1a2e;
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 10px;
+      }
+      .api-section h3 {
+        color: #333;
+        font-size: 1.2rem;
+        margin-top: 25px;
+        margin-bottom: 15px;
+      }
+      .endpoint {
+        background: #f8f9fa;
+        border-left: 4px solid #4CAF50;
+        padding: 15px 20px;
+        margin: 20px 0;
+        border-radius: 6px;
+      }
+      .endpoint.get {
+        border-left-color: #4CAF50;
+      }
+      .endpoint.post {
+        border-left-color: #2196F3;
+      }
+      .endpoint-method {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-weight: bold;
+        font-size: 0.85rem;
+        margin-right: 10px;
+      }
+      .endpoint-method.get {
+        background: #4CAF50;
+        color: white;
+      }
+      .endpoint-method.post {
+        background: #2196F3;
+        color: white;
+      }
+      .endpoint-url {
+        font-family: 'Courier New', monospace;
+        color: #333;
+        font-size: 1rem;
+      }
+      code {
+        background: #f5f5f5;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        color: #d63384;
+      }
+      pre {
+        background: #2d2d2d;
+        color: #f8f8f2;
+        padding: 20px;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 20px 0;
+      }
+      pre code {
+        background: none;
+        padding: 0;
+        color: inherit;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      th, td {
+        border: 1px solid #e0e0e0;
+        padding: 12px 15px;
+        text-align: left;
+      }
+      th {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #333;
+      }
+      tr:nth-child(even) {
+        background: #fafafa;
+      }
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        color: #4CAF50;
+        text-decoration: none;
+        font-weight: 500;
+        margin-bottom: 30px;
+        transition: color 0.3s;
+      }
+      .back-link:hover {
+        color: #45a049;
+      }
+      .back-link i {
+        margin-right: 8px;
+      }
+      .note {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 15px 20px;
+        border-radius: 6px;
+        margin: 20px 0;
+      }
+      .note strong {
+        color: #856404;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Animated Background Blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <header class="main-header">
+      <div class="header-content">
+        <div class="logo">
+          <i class="fas fa-globe-americas"></i>
+          <span>Yavqo</span>
+        </div>
+        <nav class="nav-links">
+          <a href="/">Home</a>
+          <a href="#solutions">Solutions</a>
+          <a href="#enterprise">Enterprise</a>
+          <a href="/docs/api">API</a>
+          <a href="#support">Support</a>
+        </nav>
+        <button class="camera-btn" id="camera-btn" title="Camera Translation">
+          <i class="fas fa-camera"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="api-docs-container">
+      <a href="/" class="back-link">
+        <i class="fas fa-arrow-left"></i>
+        Back to Home
+      </a>
+
+      <div class="api-docs-header">
+        <h1>Translation API Documentation</h1>
+        <p>Free, no API key required. Translate text between 100+ languages with our simple REST API.</p>
+      </div>
+
+      <div class="api-section">
+        <h2>Overview</h2>
+        <p>Yavqo Translation API provides free access to professional translation services without requiring an API key. Our API supports 100+ languages and offers both GET and POST endpoints for flexibility.</p>
+        
+        <h3>Base URL</h3>
+        <pre><code>http://localhost:3000/api</code></pre>
+      </div>
+
+      <div class="api-section">
+        <h2>Endpoints</h2>
+
+        <h3>Health Check</h3>
+        <p>Check if the API is running.</p>
+        <div class="endpoint get">
+          <span class="endpoint-method get">GET</span>
+          <span class="endpoint-url">/api/health</span>
+        </div>
+        <h4>Response:</h4>
+        <pre><code>{
+  "status": "ok",
+  "message": "Translation API is running",
+  "version": "1.0.0"
+}</code></pre>
+      </div>
+
+      <div class="api-section">
+        <h3>Translate (GET)</h3>
+        <p>Translate text using query parameters.</p>
+        <div class="endpoint get">
+          <span class="endpoint-method get">GET</span>
+          <span class="endpoint-url">/api/translate</span>
+        </div>
+        
+        <h4>Query Parameters:</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Type</th>
+              <th>Required</th>
+              <th>Default</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>q</code></td>
+              <td>string</td>
+              <td>Yes</td>
+              <td>-</td>
+              <td>Text to translate</td>
+            </tr>
+            <tr>
+              <td><code>sl</code></td>
+              <td>string</td>
+              <td>No</td>
+              <td>auto</td>
+              <td>Source language code</td>
+            </tr>
+            <tr>
+              <td><code>tl</code></td>
+              <td>string</td>
+              <td>No</td>
+              <td>en</td>
+              <td>Target language code</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4>Example Request:</h4>
+        <pre><code>curl "http://localhost:3000/api/translate?q=hello&amp;sl=en&amp;tl=es"</code></pre>
+
+        <h4>Response:</h4>
+        <pre><code>{
+  "success": true,
+  "translation": {
+    "text": "hello",
+    "translatedText": "Hola",
+    "sourceLanguage": "en",
+    "targetLanguage": "es"
+  }
+}</code></pre>
+      </div>
+
+      <div class="api-section">
+        <h3>Translate (POST)</h3>
+        <p>Translate longer text using JSON body.</p>
+        <div class="endpoint post">
+          <span class="endpoint-method post">POST</span>
+          <span class="endpoint-url">/api/translate</span>
+        </div>
+
+        <h4>Headers:</h4>
+        <pre><code>Content-Type: application/json</code></pre>
+
+        <h4>Body Parameters:</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Type</th>
+              <th>Required</th>
+              <th>Default</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>text</code></td>
+              <td>string</td>
+              <td>Yes</td>
+              <td>-</td>
+              <td>Text to translate</td>
+            </tr>
+            <tr>
+              <td><code>sourceLanguage</code></td>
+              <td>string</td>
+              <td>No</td>
+              <td>auto</td>
+              <td>Source language code</td>
+            </tr>
+            <tr>
+              <td><code>targetLanguage</code></td>
+              <td>string</td>
+              <td>No</td>
+              <td>en</td>
+              <td>Target language code</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4>Example Request:</h4>
+        <pre><code>curl -X POST "http://localhost:3000/api/translate" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Good morning","sourceLanguage":"en","targetLanguage":"fr"}'</code></pre>
+
+        <h4>Response:</h4>
+        <pre><code>{
+  "success": true,
+  "translation": {
+    "text": "Good morning",
+    "translatedText": "Bonjour",
+    "sourceLanguage": "en",
+    "targetLanguage": "fr"
+  }
+}</code></pre>
+      </div>
+
+      <div class="api-section">
+        <h2>Supported Languages</h2>
+        <p>The API supports 100+ languages including:</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Language</th>
+              <th>Code</th>
+              <th>Language</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>en</code></td><td>English</td><td><code>es</code></td><td>Spanish</td></tr>
+            <tr><td><code>fr</code></td><td>French</td><td><code>de</code></td><td>German</td></tr>
+            <tr><td><code>it</code></td><td>Italian</td><td><code>pt</code></td><td>Portuguese</td></tr>
+            <tr><td><code>ru</code></td><td>Russian</td><td><code>ja</code></td><td>Japanese</td></tr>
+            <tr><td><code>ko</code></td><td>Korean</td><td><code>zh-CN</code></td><td>Chinese (Simplified)</td></tr>
+            <tr><td><code>zh-TW</code></td><td>Chinese (Traditional)</td><td><code>ar</code></td><td>Arabic</td></tr>
+            <tr><td><code>hi</code></td><td>Hindi</td><td><code>bn</code></td><td>Bengali</td></tr>
+            <tr><td><code>tr</code></td><td>Turkish</td><td><code>vi</code></td><td>Vietnamese</td></tr>
+            <tr><td><code>th</code></td><td>Thai</td><td><code>id</code></td><td>Indonesian</td></tr>
+            <tr><td><code>nl</code></td><td>Dutch</td><td><code>pl</code></td><td>Polish</td></tr>
+            <tr><td><code>uk</code></td><td>Ukrainian</td><td><code>el</code></td><td>Greek</td></tr>
+            <tr><td><code>he</code></td><td>Hebrew</td><td><code>sv</code></td><td>Swedish</td></tr>
+            <tr><td><code>no</code></td><td>Norwegian</td><td><code>da</code></td><td>Danish</td></tr>
+            <tr><td><code>fi</code></td><td>Finnish</td><td><code>cs</code></td><td>Czech</td></tr>
+            <tr><td><code>ro</code></td><td>Romanian</td><td><code>hu</code></td><td>Hungarian</td></tr>
+            <tr><td><code>auto</code></td><td>Auto-detect</td><td></td><td></td></tr>
+          </tbody>
+        </table>
+        <p><em>Use <code>auto</code> as the source language to automatically detect the language.</em></p>
+      </div>
+
+      <div class="api-section">
+        <h2>Usage Examples</h2>
+
+        <h3>JavaScript (Fetch)</h3>
+        <pre><code>// GET request
+const response = await fetch('http://localhost:3000/api/translate?q=hello&amp;sl=en&amp;tl=es');
+const data = await response.json();
+console.log(data.translation.translatedText); // "Hola"
+
+// POST request
+const response = await fetch('http://localhost:3000/api/translate', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    text: 'Good morning',
+    sourceLanguage: 'en',
+    targetLanguage: 'fr'
+  })
+});
+const data = await response.json();
+console.log(data.translation.translatedText); // "Bonjour"</code></pre>
+
+        <h3>Python (Requests)</h3>
+        <pre><code>import requests
+
+# GET request
+response = requests.get('http://localhost:3000/api/translate', params={
+    'q': 'hello',
+    'sl': 'en',
+    'tl': 'es'
+})
+data = response.json()
+print(data['translation']['translatedText'])  # "Hola"
+
+# POST request
+response = requests.post('http://localhost:3000/api/translate', json={
+    'text': 'Good morning',
+    'sourceLanguage': 'en',
+    'targetLanguage': 'fr'
+})
+data = response.json()
+print(data['translation']['translatedText'])  # "Bonjour"</code></pre>
+
+        <h3>cURL</h3>
+        <pre><code># GET request
+curl "http://localhost:3000/api/translate?q=hello&amp;sl=en&amp;tl=es"
+
+# POST request
+curl -X POST "http://localhost:3000/api/translate" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Good morning","sourceLanguage":"en","targetLanguage":"fr"}'</code></pre>
+      </div>
+
+      <div class="api-section">
+        <h2>Error Responses</h2>
+
+        <h3>Missing Required Parameter</h3>
+        <pre><code>{
+  "error": "Missing required parameter: q (text to translate)"
+}</code></pre>
+
+        <h3>Translation Service Unavailable</h3>
+        <pre><code>{
+  "success": false,
+  "error": "Unable to translate. Please try again."
+}</code></pre>
+      </div>
+
+      <div class="api-section">
+        <h2>Running the Server</h2>
+        <pre><code># Install dependencies
+npm install
+
+# Start the server
+npm start</code></pre>
+        <p>The server will start on port 3000 by default. You can change the port by setting the <code>PORT</code> environment variable:</p>
+        <pre><code>PORT=8080 npm start</code></pre>
+      </div>
+
+      <div class="note">
+        <strong>Note:</strong> No API key required - This API is free to use. Rate limiting may apply depending on Google's translation service. Maximum text length: 5000 characters per request.
+      </div>
+
+      <footer class="footer">
+        <p>&copy; 2024 Yavqo. All rights reserved.</p>
+      </footer>
+    </div>
+
+    <script src="../js/countries.js"></script>
+    <script src="../js/script.js"></script>
+  </body>
+</html>
