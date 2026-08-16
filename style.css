@@ -128,6 +128,11 @@ body {
   color: var(--primary-color);
 }
 
+.nav-links a.active {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
 /* Camera Button */
 .camera-btn {
   width: 40px;
